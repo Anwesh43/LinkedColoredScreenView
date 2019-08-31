@@ -205,4 +205,13 @@ class ColoredScreenView(ctx : Context) : View(ctx) {
             }
         }
     }
+
+    companion object {
+
+        fun create(activity : Activity) : ColoredScreenView {
+            val view : ColoredScreenView = ColoredScreenView(activity)
+            activity.setContentView(view)
+            return view 
+        }
+    }
 }
