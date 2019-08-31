@@ -13,8 +13,8 @@ import android.graphics.Canvas
 import android.view.View
 import android.view.MotionEvent
 
-val scGap : Float = 0.05f
-val delay : Long = 20
+val scGap : Float = 0.01f
+val delay : Long = 10
 val colors : Array<String> = arrayOf("#4CAF50", "#01579B", "#1A237E", "#E65100", "#f44336")
 val backColor : Int = Color.parseColor("#BDBDBD")
 val rFactor : Float = 6f
@@ -39,9 +39,9 @@ fun Canvas.drawColoredScreen(i : Int, scale : Float, sc : Float, paint : Paint) 
     }
     save()
     translate(-w * sc2 + x, 0f)
-    drawSweepArc(w / 2, h / 2, sc1, r, paint)
     paint.color = Color.parseColor(colors[i])
     drawRect(RectF(0f, 0f, w, h), paint)
+    drawSweepArc(w / 2, h / 2, sc1, r, paint)
     restore()
     return sc2
 }
@@ -71,7 +71,7 @@ class ColoredScreenView(ctx : Context) : View(ctx) {
     data class State(var scale : Float = 0f, var dir : Float = 0f, var prevScale : Float = 0f) {
 
         fun update(cb : (Float) -> Unit) {
-            scale += prevScale + dir
+            scale += dir * scGap
             if (Math.abs(scale - prevScale) > 1) {
                 scale = prevScale + dir
                 dir = 0f
@@ -94,7 +94,7 @@ class ColoredScreenView(ctx : Context) : View(ctx) {
             if (animated) {
                 cb()
                 try {
-                    Thread.sleep(50)
+                    Thread.sleep(delay)
                     view.invalidate()
                 } catch(ex : Exception) {
 
