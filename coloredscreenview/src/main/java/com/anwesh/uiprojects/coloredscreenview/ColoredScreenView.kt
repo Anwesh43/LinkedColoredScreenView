@@ -33,6 +33,10 @@ fun Canvas.drawColoredScreen(i : Int, scale : Float, sc : Float, paint : Paint) 
     restore()
 }
 
+fun Int.inverse() : Float = 1f / this
+fun Float.maxScale(i : Int, n : Int) : Float = Math.max(0f, this - i * n.inverse())
+fun Float.divideScale(i : Int, n : Int) : Float = Math.min(n.inverse(), maxScale(i, n)) * n
+
 class ColoredScreenView(ctx : Context) : View(ctx) {
 
     private val paint : Paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -139,7 +143,7 @@ class ColoredScreenView(ctx : Context) : View(ctx) {
                 return curr
             }
             cb()
-            return this 
+            return this
         }
     }
 }
