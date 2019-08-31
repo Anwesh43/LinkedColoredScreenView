@@ -17,6 +17,7 @@ val scGap : Float = 0.05f
 val delay : Long = 20
 val colors : Array<String> = arrayOf("#4CAF50", "#01579B", "#1A237E", "#E65100", "#f44336")
 val backColor : Int = Color.parseColor("#BDBDBD")
+val scf : Float = 0.5f
 
 fun Canvas.drawColoredScreen(i : Int, scale : Float, sc : Float, paint : Paint) {
     val w : Float = width.toFloat()
@@ -95,6 +96,50 @@ class ColoredScreenView(ctx : Context) : View(ctx) {
             if (animated) {
                 animated = false
             }
+        }
+    }
+
+    data class CSNode(var i : Int, val state : State = State()) {
+
+        private var next : CSNode? = null
+        private var prev : CSNode? = null
+
+        init {
+            addNeighbor()
+        }
+
+        fun addNeighbor() {
+            if (i < colors.size - 1) {
+                next = CSNode(i + 1)
+                next?.prev = this
+            }
+        }
+
+        fun draw(canvas : Canvas, sc : Float, paint : Paint) {
+            canvas.drawColoredScreen(i, state.scale, sc, paint)
+            if (state.scale >= scf) {
+                next?.draw(canvas, state.scale, paint)
+            }
+        }
+
+        fun update(cb : (Float) -> Unit) {
+            state.update(cb)
+        }
+
+        fun startUpdating(cb : () -> Unit) {
+            state.startUpdating(cb)
+        }
+
+        fun getNext(cb : () -> Unit, dir : Int) : CSNode {
+            var curr : CSNode? = prev
+            if (dir == 1) {
+                curr = next
+            }
+            if (curr != null) {
+                return curr
+            }
+            cb()
+            return this 
         }
     }
 }
