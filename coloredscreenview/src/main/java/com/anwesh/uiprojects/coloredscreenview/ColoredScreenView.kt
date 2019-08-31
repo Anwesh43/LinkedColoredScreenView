@@ -183,4 +183,26 @@ class ColoredScreenView(ctx : Context) : View(ctx) {
             curr.startUpdating(cb)
         }
     }
+
+    data class Renderer(var view : ColoredScreenView) {
+
+        private val cs : ColoredScreen = ColoredScreen(0)
+        private val animator : Animator = Animator(view)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(backColor)
+            cs.draw(canvas, paint)
+            animator.animate {
+                cs.update {
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            cs.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
