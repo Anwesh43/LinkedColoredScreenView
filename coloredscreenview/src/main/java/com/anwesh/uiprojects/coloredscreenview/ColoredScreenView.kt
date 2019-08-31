@@ -17,20 +17,33 @@ val scGap : Float = 0.05f
 val delay : Long = 20
 val colors : Array<String> = arrayOf("#4CAF50", "#01579B", "#1A237E", "#E65100", "#f44336")
 val backColor : Int = Color.parseColor("#BDBDBD")
-val scf : Float = 0.5f
+val rFactor : Float = 6f
 
-fun Canvas.drawColoredScreen(i : Int, scale : Float, sc : Float, paint : Paint) {
+fun Canvas.drawSweepArc(x : Float, y : Float, sc : Float, r : Float, paint : Paint) {
+    paint.color = Color.WHITE
+    save()
+    translate(x, y)
+    drawArc(RectF(-r, -r, r, r), 0f, 360f * (1 - sc), true, paint)
+    restore()
+}
+
+fun Canvas.drawColoredScreen(i : Int, scale : Float, sc : Float, paint : Paint) : Float {
     val w : Float = width.toFloat()
     val h : Float = height.toFloat()
     var x : Float = 0f
+    val sc1 : Float = scale.divideScale(0, 2)
+    val sc2 : Float = scale.divideScale(1, 2)
+    val r : Float = Math.min(w, h) / rFactor
     if (sc != 0f) {
         x = w * (1 - sc)
     }
     save()
-    translate(-w * scale + x, 0f)
+    translate(-w * sc2 + x, 0f)
+    drawSweepArc(w / 2, h / 2, sc1, r, paint)
     paint.color = Color.parseColor(colors[i])
     drawRect(RectF(0f, 0f, w, h), paint)
     restore()
+    return sc2
 }
 
 fun Int.inverse() : Float = 1f / this
@@ -120,9 +133,9 @@ class ColoredScreenView(ctx : Context) : View(ctx) {
         }
 
         fun draw(canvas : Canvas, sc : Float, paint : Paint) {
-            canvas.drawColoredScreen(i, state.scale, sc, paint)
-            if (state.scale >= scf) {
-                next?.draw(canvas, state.scale, paint)
+            val sck : Float = canvas.drawColoredScreen(i, state.scale, sc, paint)
+            if (sck > 0f) {
+                next?.draw(canvas, sck, paint)
             }
         }
 
